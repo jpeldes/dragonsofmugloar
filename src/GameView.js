@@ -19,17 +19,15 @@ const GameView = () => {
   const gameId = game ? game.gameId : null;
 
   const handleGameUpdate = (data) => {
-    // Pluck safe keys
-    let plucker = ({ gold, lives, score, highScore, turn }) => ({
-      gold,
-      lives,
-      score,
-      highScore,
-      turn,
-    });
-    let pluckedData = plucker(data);
+    const safeKeys = ["gold", "lives", "score", "highScore", "turn"];
+    let newObj = safeKeys.reduce((obj, key) => {
+      if (key in data) {
+        obj[key] = data[key];
+      }
+      return obj;
+    }, {});
     // Update game
-    setGame({ ...game, ...pluckedData });
+    setGame({ ...game, ...newObj });
   };
 
   return (
