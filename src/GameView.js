@@ -44,7 +44,7 @@ const GameView = () => {
       {gameId && (
         <article>
           <h3>Shop</h3>
-          <ShopView gameId={gameId} />
+          <ShopView gameId={gameId} handleGameUpdate={handleGameUpdate} />
         </article>
       )}
     </div>
