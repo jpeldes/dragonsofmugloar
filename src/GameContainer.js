@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import GameView from "./GameView";
 import { GameList } from "./GameList";
 import {
@@ -12,7 +12,7 @@ import {
 const useMessageList = (gameId) => {
   const [list, setList] = useState([]);
 
-  const syncMessages = () => {
+  const syncMessages = async () => {
     if (gameId) {
       return apiSyncMessages(gameId).then(translateTricks).then(setList);
     } else {
@@ -44,18 +44,6 @@ const useLocalStorage = () => {
   return [gamesToStorage, gamesFromStorage];
 };
 
-const useReputation = (gameId) => {
-  const [rep, setRep] = useState(null);
-  const syncRep = useCallback(() => apiInvestigate(gameId).then(setRep), [gameId]);
-  useEffect(() => {
-    if (gameId) {
-      syncRep();
-    }
-  }, [gameId, syncRep]);
-
-  return [rep, syncRep];
-};
-
 function GameContainer() {
   // State
 
@@ -66,8 +54,6 @@ function GameContainer() {
   const activeGame = games[activeGameId];
 
   const [syncMessages, messageList] = useMessageList(activeGameId);
-
-  const [activeGameRep, syncRep] = useReputation(activeGameId);
 
   // Handlers
 
@@ -97,7 +83,6 @@ function GameContainer() {
     return apiSolveAd(activeGameId, adId).then((data) => {
       handleSaveExistingGame(activeGameId, data);
       syncMessages();
-      syncRep();
       return data;
     });
   };
@@ -110,6 +95,15 @@ function GameContainer() {
     });
   };
 
+  const [activeGameRep, setRep] = useState({});
+  const handleInvestigate = () =>
+    apiInvestigate(activeGameId).then(async (data) => {
+      await syncMessages();
+      let game = games[activeGameId];
+      handleSaveExistingGame(activeGameId, { ...game, turn: game.turn + 1 });
+      setRep(data);
+    });
+
   // Render
 
   return (
@@ -121,6 +115,7 @@ function GameContainer() {
           messages={messageList}
           handleSolveAd={handleSolveAd}
           handleBuyItem={handleBuyItem}
+          handleInvestigate={handleInvestigate}
         />
       ) : (
         <GameList
