@@ -78,9 +78,6 @@ export const MessageList = ({ gameId, handleGameUpdate }) => {
           ))}
         </tbody>
       </table>
-      <div>
-        <button onClick={syncMessages}>Sync messages</button>
-      </div>
     </div>
   );
 };
