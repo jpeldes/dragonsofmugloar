@@ -1,7 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import GameView from "./GameView";
 import { GameList } from "./GameList";
-import { apiGameStart, apiSolveAd, apiBuyItem } from "./api";
+import { apiGameStart, apiSolveAd, apiBuyItem, apiSyncMessages } from "./api";
+
+const useMessageList = (gameId) => {
+  const [list, setList] = useState([]);
+
+  useEffect(() => {
+    apiSyncMessages(gameId).then(setList);
+  }, [gameId]);
+
+  const syncMessages = () => {
+    console.log("Sync messages");
+    return apiSyncMessages(gameId).then(setList);
+  };
+
+  return [syncMessages, list];
+};
 
 const useLocalStorage = () => {
   const gamesToStorage = (newSavedGames) =>
@@ -19,8 +34,17 @@ const useLocalStorage = () => {
 };
 
 function GameContainer() {
+  // State
+
   const [gamesToStorage, gamesFromStorage] = useLocalStorage();
   const [games, setGames] = useState(gamesFromStorage());
+
+  const [activeGameId, setActiveGameId] = useState(null);
+  const activeGame = games[activeGameId];
+
+  const [syncMessages, messageList] = useMessageList(activeGameId);
+
+  // Handlers
 
   const handleSaveExistingGame = (gameId, data) => {
     let newGame = { ...games[gameId], ...pluckRelevantGameData(data) };
@@ -44,28 +68,30 @@ function GameContainer() {
     });
   };
 
-  const handleSolveAd = (gameId, adId) => {
-    return apiSolveAd(gameId, adId).then((data) => {
-      handleSaveExistingGame(gameId, data);
+  const handleSolveAd = (adId) => {
+    return apiSolveAd(activeGameId, adId).then((data) => {
+      handleSaveExistingGame(activeGameId, data);
+      syncMessages();
       return data;
     });
   };
 
-  const handleBuyItem = (gameId, itemId) => {
-    return apiBuyItem(gameId, itemId).then((data) => {
-      handleSaveExistingGame(gameId, data);
+  const handleBuyItem = (itemId) => {
+    return apiBuyItem(activeGameId, itemId).then((data) => {
+      handleSaveExistingGame(activeGameId, data);
+      syncMessages();
       return data;
     });
   };
 
-  const [activeGameId, setActiveGameId] = useState(null);
-  const activeGame = games[activeGameId];
+  // Render
 
   return (
     <div className="GameContainer">
       {activeGameId ? (
         <GameView
           game={activeGame}
+          messages={messageList}
           handleSolveAd={handleSolveAd}
           handleBuyItem={handleBuyItem}
         />

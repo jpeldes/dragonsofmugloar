@@ -1,5 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { apiSyncMessages } from "./api";
+import React, { useCallback } from "react";
 
 const isBase64 = (str) => {
   try {
@@ -13,10 +12,10 @@ export const MessageListItem = ({ ad, onClickSolveAd }) => {
   const { adId, message, probability, expiresIn, reward } = ad;
   return (
     <tr>
-      <td>{isBase64(message) ? (message) : message}</td>
+      <td>{isBase64(message) ? message : message}</td>
       <td>{expiresIn}</td>
       <td>{reward}</td>
-      <td>{isBase64(probability) ? (probability) : probability}</td>
+      <td>{isBase64(probability) ? probability : probability}</td>
       <td>
         <button onClick={() => onClickSolveAd(adId)}>SOLVE</button>
       </td>
@@ -24,19 +23,10 @@ export const MessageListItem = ({ ad, onClickSolveAd }) => {
   );
 };
 
-export const MessageList = ({ gameId, handleSolveAd }) => {
-  const [syncMessages, list] = useMessageList(gameId);
-
-  const onClickSolveAd = useCallback(
-    (adId) => {
-      return handleSolveAd(gameId, adId).then((data) => {
-        syncMessages();
-        return data;
-      });
-    },
-    [gameId, handleSolveAd, syncMessages]
-  );
-
+export const MessageList = ({ messages, handleSolveAd }) => {
+  const onClickSolveAd = useCallback((adId) => handleSolveAd(adId), [
+    handleSolveAd,
+  ]);
   return (
     <div className="messagelist">
       <table>
@@ -50,7 +40,7 @@ export const MessageList = ({ gameId, handleSolveAd }) => {
           </tr>
         </thead>
         <tbody>
-          {list.map((ad) => (
+          {messages.map((ad) => (
             <MessageListItem
               key={ad.adId}
               ad={ad}
@@ -61,14 +51,4 @@ export const MessageList = ({ gameId, handleSolveAd }) => {
       </table>
     </div>
   );
-};
-
-const useMessageList = (gameId) => {
-  const [list, setList] = useState([]);
-  const syncMessages = () => apiSyncMessages(gameId).then(setList);
-  useEffect(() => {
-    apiSyncMessages(gameId).then(setList);
-  }, [gameId]);
-
-  return [syncMessages, list];
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useEffect } from "react";
 import { apiSyncShop } from "./api";
 
@@ -20,7 +20,9 @@ const ShopView = ({ gameId, handleBuyItem }) => {
     apiSyncShop(gameId).then(saveShop);
   }, [gameId]);
 
-  const onClickBuyItem = (itemId) => handleBuyItem(gameId, itemId);
+  const onClickBuyItem = useCallback((itemId) => handleBuyItem(itemId), [
+    handleBuyItem,
+  ]);
 
   return (
     <div>
