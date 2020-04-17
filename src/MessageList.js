@@ -13,10 +13,10 @@ export const MessageListItem = ({ ad, onClickSolveAd }) => {
   const { adId, message, probability, expiresIn, reward } = ad;
   return (
     <tr>
-      <td>{isBase64(message) ? atob(message) : message}</td>
+      <td>{isBase64(message) ? (message) : message}</td>
       <td>{expiresIn}</td>
       <td>{reward}</td>
-      <td>{isBase64(probability) ? atob(probability) : probability}</td>
+      <td>{isBase64(probability) ? (probability) : probability}</td>
       <td>
         <button onClick={() => onClickSolveAd(adId)}>SOLVE</button>
       </td>
