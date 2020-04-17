@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { apiSolveAd, apiSyncMessages } from "./api";
 
+const isBase64 = (str) => {
+  try {
+    return btoa(atob(str)) === str;
+  } catch (err) {
+    return false;
+  }
+};
+
 const SolveButton = ({ handleSolveAd, adId }) => {
   const [text, setText] = useState("SOLVE");
   const handleClick = () =>
@@ -25,10 +33,10 @@ const SolveButton = ({ handleSolveAd, adId }) => {
 export const MessageListItem = ({ ad, handleSolveAd }) => {
   return (
     <tr>
-      <td>{ad.reward}</td>
-      <td>{ad.message}</td>
+      <td>{isBase64(ad.message) ? atob(ad.message) : ad.message}</td>
       <td>{ad.expiresIn}</td>
-      <td>{ad.probability}</td>
+      <td>{ad.reward}</td>
+      <td>{isBase64(ad.probability) ? atob(ad.probability) : ad.probability}</td>
       <td>
         <SolveButton handleSolveAd={handleSolveAd} adId={ad.adId} />
       </td>
@@ -37,22 +45,24 @@ export const MessageListItem = ({ ad, handleSolveAd }) => {
 };
 
 export const MessageList = ({ gameId, handleGameUpdate }) => {
-  const handleSolveAd = (adId) =>
-    apiSolveAd(gameId, adId).then((data) => {
-      handleGameUpdate(data);
-      return data;
-    });
-
   const [syncMessages, list] = useMessageList(gameId);
+
+  const handleSolveAd = (adId) =>
+    apiSolveAd(gameId, adId)
+      .then((data) => {
+        handleGameUpdate(data);
+        return data;
+      })
+      .then(syncMessages);
 
   return (
     <div className="messagelist">
       <table>
         <thead>
           <tr>
-            <th>Reward</th>
             <th>Message</th>
-            <th>Tries</th>
+            <th>Expires</th>
+            <th>Reward</th>
             <th>Difficulty</th>
             <th>Solve?</th>
           </tr>
