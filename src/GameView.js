@@ -3,7 +3,7 @@ import { GameStats } from "./GameStats";
 import { MessageList } from "./MessageList";
 import ShopView from "./ShopView";
 
-const GameView = ({ saveGame, game }) => {
+const GameView = ({ game, handleSolveAd, handleBuyItem }) => {
   const gameId = game ? game.gameId : null;
   return (
     <div>
@@ -11,13 +11,13 @@ const GameView = ({ saveGame, game }) => {
       {gameId && (
         <article>
           <h3>Messages / Tasks / Ads</h3>
-          <MessageList gameId={gameId} handleGameUpdate={saveGame} />
+          <MessageList gameId={gameId} handleSolveAd={handleSolveAd} />
         </article>
       )}
       {gameId && (
         <article>
           <h3>Shop</h3>
-          <ShopView gameId={gameId} handleGameUpdate={saveGame} />
+          <ShopView gameId={gameId} handleBuyItem={handleBuyItem} />
         </article>
       )}
     </div>

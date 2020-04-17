@@ -1,31 +1,26 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
-import { apiSyncShop, apiBuyItem } from "./api";
+import { apiSyncShop } from "./api";
 
-const ShopListItem = ({ item, handleBuyItem }) => {
-  const handleClick = () => handleBuyItem(item.id);
+const ShopListItem = ({ item, onClickBuyItem }) => {
   return (
     <tr>
       <td>{item.name}</td>
       <td>{item.cost}</td>
       <td>
-        <button onClick={handleClick}>Buy</button>
+        <button onClick={() => onClickBuyItem(item.id)}>Buy</button>
       </td>
     </tr>
   );
 };
 
-const ShopView = ({ gameId, handleGameUpdate }) => {
+const ShopView = ({ gameId, handleBuyItem }) => {
   const [shopItems, saveShop] = useState([]);
   useEffect(() => {
     apiSyncShop(gameId).then(saveShop);
   }, [gameId]);
 
-  const handleBuyItem = (itemId) =>
-    apiBuyItem(gameId, itemId).then((data) => {
-      handleGameUpdate(data);
-      return data;
-    });
+  const onClickBuyItem = (itemId) => handleBuyItem(gameId, itemId);
 
   return (
     <div>
@@ -42,7 +37,7 @@ const ShopView = ({ gameId, handleGameUpdate }) => {
             <ShopListItem
               key={item.id}
               item={item}
-              handleBuyItem={handleBuyItem}
+              onClickBuyItem={onClickBuyItem}
             />
           ))}
         </tbody>

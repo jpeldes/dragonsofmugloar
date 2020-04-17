@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import GameView from "./GameView";
 import { GameList } from "./GameList";
-import { apiGameStart } from "./api";
+import { apiGameStart, apiSolveAd, apiBuyItem } from "./api";
 
 const useLocalStorage = () => {
   const gamesToStorage = (newSavedGames) =>
@@ -24,20 +24,36 @@ function GameContainer() {
 
   const handleSaveExistingGame = (gameId, data) => {
     let newGame = { ...games[gameId], ...pluckRelevantGameData(data) };
-    let newGames = { ...games, [data.gameId]: newGame };
+    let newGames = { ...games, [gameId]: newGame };
 
     setGames(newGames);
     gamesToStorage(newGames);
   };
 
   const handleNewGame = () => {
-    return apiGameStart().then((data) => {
-      let newGames = { [data.gameId]: data, ...games };
+    return apiGameStart().then((newGame) => {
+      const gameId = newGame.gameId;
+
+      let newGames = { [gameId]: newGame, ...games };
 
       setGames(newGames);
       gamesToStorage(newGames);
 
-      setActiveGameId(data.gameId);
+      setActiveGameId(gameId);
+      return newGame;
+    });
+  };
+
+  const handleSolveAd = (gameId, adId) => {
+    return apiSolveAd(gameId, adId).then((data) => {
+      handleSaveExistingGame(gameId, data);
+      return data;
+    });
+  };
+
+  const handleBuyItem = (gameId, itemId) => {
+    return apiBuyItem(gameId, itemId).then((data) => {
+      handleSaveExistingGame(gameId, data);
       return data;
     });
   };
@@ -48,7 +64,11 @@ function GameContainer() {
   return (
     <div className="GameContainer">
       {activeGameId ? (
-        <GameView game={activeGame} saveGame={handleSaveExistingGame} />
+        <GameView
+          game={activeGame}
+          handleSolveAd={handleSolveAd}
+          handleBuyItem={handleBuyItem}
+        />
       ) : (
         <GameList
           games={games}

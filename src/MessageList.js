@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { apiSolveAd, apiSyncMessages } from "./api";
+import React, { useEffect, useState, useCallback } from "react";
+import { apiSyncMessages } from "./api";
 
 const isBase64 = (str) => {
   try {
@@ -9,51 +9,33 @@ const isBase64 = (str) => {
   }
 };
 
-const SolveButton = ({ handleSolveAd, adId }) => {
-  const [text, setText] = useState("SOLVE");
-  const handleClick = () =>
-    handleSolveAd(adId)
-      .then((data) => {
-        if (data.success) {
-          setText("√");
-        } else {
-          setText("x");
-        }
-      })
-      .catch(() => {
-        setText("x");
-      });
-  return (
-    <button disabled={text !== "SOLVE"} onClick={handleClick}>
-      {text}
-    </button>
-  );
-};
-
-export const MessageListItem = ({ ad, handleSolveAd }) => {
+export const MessageListItem = ({ ad, onClickSolveAd }) => {
+  const { adId, message, probability, expiresIn, reward } = ad;
   return (
     <tr>
-      <td>{isBase64(ad.message) ? atob(ad.message) : ad.message}</td>
-      <td>{ad.expiresIn}</td>
-      <td>{ad.reward}</td>
-      <td>{isBase64(ad.probability) ? atob(ad.probability) : ad.probability}</td>
+      <td>{isBase64(message) ? atob(message) : message}</td>
+      <td>{expiresIn}</td>
+      <td>{reward}</td>
+      <td>{isBase64(probability) ? atob(probability) : probability}</td>
       <td>
-        <SolveButton handleSolveAd={handleSolveAd} adId={ad.adId} />
+        <button onClick={() => onClickSolveAd(adId)}>SOLVE</button>
       </td>
     </tr>
   );
 };
 
-export const MessageList = ({ gameId, handleGameUpdate }) => {
+export const MessageList = ({ gameId, handleSolveAd }) => {
   const [syncMessages, list] = useMessageList(gameId);
 
-  const handleSolveAd = (adId) =>
-    apiSolveAd(gameId, adId)
-      .then((data) => {
-        handleGameUpdate(data);
+  const onClickSolveAd = useCallback(
+    (adId) => {
+      return handleSolveAd(gameId, adId).then((data) => {
+        syncMessages();
         return data;
-      })
-      .then(syncMessages);
+      });
+    },
+    [gameId, handleSolveAd, syncMessages]
+  );
 
   return (
     <div className="messagelist">
@@ -71,9 +53,8 @@ export const MessageList = ({ gameId, handleGameUpdate }) => {
           {list.map((ad) => (
             <MessageListItem
               key={ad.adId}
-              gameId={gameId}
               ad={ad}
-              handleSolveAd={handleSolveAd}
+              onClickSolveAd={onClickSolveAd}
             />
           ))}
         </tbody>
