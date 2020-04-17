@@ -152,7 +152,7 @@ function translateTricks(messageList) {
       try {
         return {
           ...ad,
-          id: atob(ad.adId),
+          adId: atob(ad.adId),
           message: atob(ad.message),
           probability: atob(ad.probability),
         };
