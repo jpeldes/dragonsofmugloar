@@ -1,0 +1,22 @@
+.game-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.game-list .item {
+  padding: 1em;
+  margin: 1em;
+  border-radius: 5px;
+  box-shadow: 0 0 8px 2px #eee;
+  background: #fafafa;
+
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+.game-list .item.new {
+  background: #33eeaa15;
+}
+.game-list .item h3 {
+  flex: 1;
+}

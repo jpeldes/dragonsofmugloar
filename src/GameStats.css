@@ -1,0 +1,13 @@
+header {
+  display: flex;
+  justify-content: center;
+  background: #fafafa;
+  border-bottom: 1px solid #efefef;
+}
+
+.stats-item {
+  text-align: center;
+  font-size: xx-large;
+  min-width: 100px;
+  min-height: 100px;
+}

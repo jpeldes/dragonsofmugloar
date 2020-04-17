@@ -5,3 +5,11 @@ html {
 button {
   font-size: large;
 }
+
+table {
+  margin: 0 auto;
+}
+
+.text-centered {
+  text-align: center;
+}
