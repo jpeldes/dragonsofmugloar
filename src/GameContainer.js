@@ -114,7 +114,7 @@ function GameContainer() {
 export default GameContainer;
 
 function pluckRelevantGameData(data) {
-  const safeKeys = ["gold", "lives", "score", "highScore", "turn"];
+  const safeKeys = ["gold", "lives", "score", "highScore", "turn", "level"];
   let newObj = safeKeys.reduce((obj, key) => {
     if (key in data) {
       obj[key] = data[key];

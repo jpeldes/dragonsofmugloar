@@ -12,7 +12,7 @@ export const GameStats = ({ game }) => {
   if (!game) {
     return <header>Game: Syncing</header>;
   }
-  const { score, gold, lives, turn } = game;
+  const { score, gold, lives, turn, level } = game;
   return (
     <header>
       <Item emoji="🎯">
@@ -26,6 +26,9 @@ export const GameStats = ({ game }) => {
       </Item>
       <Item emoji="🚶‍♂️">
         <div>{turn}</div>
+      </Item>
+      <Item emoji="🐲">
+        <div>{level}</div>
       </Item>
     </header>
   );
