@@ -1,5 +1,4 @@
 import React from "react";
-import { apiGameStart } from "./api";
 
 const NewGameItem = ({ handleNewGame }) => (
   <div>
@@ -15,28 +14,14 @@ const GameItem = ({ gameId, handleClick }) => (
   </div>
 );
 
-export const GameList = ({ games, saveGame, setActiveGameId }) => {
-  const handleNewGame = () => {
-    apiGameStart().then((data) => {
-      saveGame(data.gameId, data);
-      setActiveGameId(data.gameId);
-      return data;
-    });
-  };
-
-  console.log(games);
-
+export const GameList = ({ games, handleNewGame, handlePlayGame }) => {
   return (
     <div>
       <h1>Welcome to Dragons of Mugloar</h1>
       <div>
         <NewGameItem handleNewGame={handleNewGame} />
         {Object.values(games).map(({ gameId }) => (
-          <GameItem
-            key={gameId}
-            gameId={gameId}
-            handleClick={setActiveGameId}
-          />
+          <GameItem key={gameId} gameId={gameId} handleClick={handlePlayGame} />
         ))}
       </div>
     </div>
