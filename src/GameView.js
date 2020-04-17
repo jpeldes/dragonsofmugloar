@@ -1,21 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { apiGameStart } from "./api";
+import React from "react";
 import { GameStats } from "./GameStats";
 import { MessageList } from "./MessageList";
 import ShopView from "./ShopView";
 
-function useStartGame() {
-  const [game, setGame] = useState(null);
-
-  useEffect(() => {
-    apiGameStart().then(setGame);
-  }, []);
-
-  return [game, setGame];
-}
-
-const GameView = () => {
-  const [game, setGame] = useStartGame();
+const GameView = ({ saveGame, game }) => {
   const gameId = game ? game.gameId : null;
 
   const handleGameUpdate = (data) => {
@@ -26,8 +14,8 @@ const GameView = () => {
       }
       return obj;
     }, {});
-    // Update game
-    setGame({ ...game, ...newObj });
+
+    saveGame(gameId, { ...game, ...newObj });
   };
 
   return (
