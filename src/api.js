@@ -24,3 +24,10 @@ export const apiBuyItem = (gameId, itemId) =>
   axios
     .post(`https://dragonsofmugloar.com/api/v2/${gameId}/shop/buy/${itemId}`)
     .then(({ data }) => data);
+
+export const apiInvestigate = (gameId) =>
+  axios
+    .post(
+      `https://dragonsofmugloar.com/api/v2/${gameId}/investigate/reputation`
+    )
+    .then(({ data }) => data);

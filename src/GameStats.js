@@ -8,12 +8,14 @@ const Item = ({ emoji, children }) => (
   </div>
 );
 
-export const GameStats = ({ game }) => {
-  if (!game) {
+export const GameStats = ({ rep, game }) => {
+  if (!game || !rep) {
     return <header>Game: Syncing</header>;
   }
   const { score, gold, lives, turn, level } = game;
+  const { people, state, underworld } = rep;
   return (
+    <>
     <header>
       <Item emoji="🎯">
         <div>{score}</div>
@@ -31,5 +33,17 @@ export const GameStats = ({ game }) => {
         <div>{level}</div>
       </Item>
     </header>
+    <header>
+      <Item emoji="👨">
+        <div>{people}</div>
+      </Item>
+      <Item emoji="🇺🇸">
+        <div>{state}</div>
+      </Item>
+      <Item emoji="🧟‍♂️">
+        <div>{underworld}</div>
+      </Item>
+    </header>
+    </>
   );
 };

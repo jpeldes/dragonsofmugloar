@@ -1,7 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import GameView from "./GameView";
 import { GameList } from "./GameList";
-import { apiGameStart, apiSolveAd, apiBuyItem, apiSyncMessages } from "./api";
+import {
+  apiGameStart,
+  apiSolveAd,
+  apiBuyItem,
+  apiSyncMessages,
+  apiInvestigate,
+} from "./api";
 
 const useMessageList = (gameId) => {
   const [list, setList] = useState([]);
@@ -38,6 +44,18 @@ const useLocalStorage = () => {
   return [gamesToStorage, gamesFromStorage];
 };
 
+const useReputation = (gameId) => {
+  const [rep, setRep] = useState(null);
+  const syncRep = useCallback(() => apiInvestigate(gameId).then(setRep), [gameId]);
+  useEffect(() => {
+    if (gameId) {
+      syncRep();
+    }
+  }, [gameId, syncRep]);
+
+  return [rep, syncRep];
+};
+
 function GameContainer() {
   // State
 
@@ -48,6 +66,8 @@ function GameContainer() {
   const activeGame = games[activeGameId];
 
   const [syncMessages, messageList] = useMessageList(activeGameId);
+
+  const [activeGameRep, syncRep] = useReputation(activeGameId);
 
   // Handlers
 
@@ -77,6 +97,7 @@ function GameContainer() {
     return apiSolveAd(activeGameId, adId).then((data) => {
       handleSaveExistingGame(activeGameId, data);
       syncMessages();
+      syncRep();
       return data;
     });
   };
@@ -95,6 +116,7 @@ function GameContainer() {
     <div className="GameContainer">
       {activeGameId ? (
         <GameView
+          rep={activeGameRep}
           game={activeGame}
           messages={messageList}
           handleSolveAd={handleSolveAd}
