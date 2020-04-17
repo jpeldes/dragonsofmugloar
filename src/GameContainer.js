@@ -6,14 +6,19 @@ import { apiGameStart, apiSolveAd, apiBuyItem, apiSyncMessages } from "./api";
 const useMessageList = (gameId) => {
   const [list, setList] = useState([]);
 
-  useEffect(() => {
-    apiSyncMessages(gameId).then(setList);
-  }, [gameId]);
-
   const syncMessages = () => {
-    console.log("Sync messages");
-    return apiSyncMessages(gameId).then(setList);
+    if (gameId) {
+      return apiSyncMessages(gameId).then(translateTricks).then(setList);
+    } else {
+      return Promise.reject();
+    }
   };
+
+  useEffect(() => {
+    if (gameId) {
+      apiSyncMessages(gameId).then(translateTricks).then(setList);
+    }
+  }, [gameId]);
 
   return [syncMessages, list];
 };
@@ -117,4 +122,22 @@ function pluckRelevantGameData(data) {
     return obj;
   }, {});
   return newObj;
+}
+
+function translateTricks(messageList) {
+  return messageList.map((ad) => {
+    if (ad.encrypted) {
+      try {
+        return {
+          ...ad,
+          id: atob(ad.adId),
+          message: atob(ad.message),
+          probability: atob(ad.probability),
+        };
+      } catch (e) {
+        return ad;
+      }
+    }
+    return ad;
+  });
 }
